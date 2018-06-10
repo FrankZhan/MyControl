@@ -1,6 +1,8 @@
 package com.frank.mycontrol;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.hardware.ConsumerIrManager;
@@ -9,6 +11,8 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -118,7 +122,14 @@ public class MainActivity extends AppCompatActivity {
         Log.e(TAG, "stop");
     }
 
+    //检查权限
+    public void requestPermission(){
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS}, 1);
 
+        }
+    }
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
         @Override
@@ -137,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "收到短信了");
         Cursor cursor = null;
         try{
+            requestPermission();
             cursor = getContentResolver().query(
                     Uri.parse("content://sms/inbox"),
                     null,
